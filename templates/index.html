@@ -3,35 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='style.css')}}">
-    <script src="https://kit.fontawesome.com/5f3f547070.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <title>Uber Rides Prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Uber Rides Predictor</title>
 </head>
 <body>
-    
-    <div class="container">
-        <h2 class='container-heading'><span class="heading_font">Uber Rides Predictor</span></h2>
-        <div class='description'>
-            <p>A Machine Learning Web App, Built with Flask</p>
-        </div>
-    </div>
+    <header class="container">
+        <h1 class="container-heading"><span class="heading_font">Uber Rides Predictor</span></h1>
+        <p class="description">A Machine Learning web app, built with Flask &middot; predicts weekly ridership</p>
+    </header>
 
-    <div class="ml-container">
-        <form action="{{url_for('predict')}}" method="POST">
-            <input class="form-input" type="text" name="Priceperweek" placeholder="Price per week eg. 25" required="required"><br>
-            <input class="form-input" type="text" name="Population" placeholder="Population eg.1800000" required="required"><br>
-            <input class="form-input" type="text" name="Monthlyincome" placeholder="Monthly income eg. 20000" required="required"><br>
-            <input class="form-input" type="text" name="Averageparkingpermonth" placeholder="Average parking per month eg. 90" required="required"><br>
-            <button type="submit" class="my-cta-button">Predict</button>
-        </form>
-    </div>
-    <br>
-    <br>
-    {{ predict_text }}
-    <br>
-    <br>
+    <main class="ml-container">
+        <section class="card form-card">
+            <h2 class="card-title">Estimate weekly riders</h2>
+            <form action="{{ url_for('predict') }}" method="POST" novalidate>
+                {% for name, meta in features.items() %}
+                <label class="field-label" for="{{ name }}">{{ meta.label }}</label>
+                <input
+                    class="form-input"
+                    id="{{ name }}"
+                    type="number"
+                    step="any"
+                    min="{{ meta.min }}"
+                    max="{{ meta.max }}"
+                    name="{{ name }}"
+                    placeholder="{{ meta.placeholder }}"
+                    value="{{ submitted[name] if submitted and submitted[name] is defined else '' }}"
+                    required>
+                {% endfor %}
+                <button type="submit" class="my-cta-button">Predict</button>
+            </form>
 
+            {% if error %}
+            <div class="alert alert-error" role="alert">{{ error }}</div>
+            {% endif %}
 
+            {% if result %}
+            <div class="result-card" role="status">
+                <span class="result-label">Estimated weekly riders</span>
+                <span class="result-value">{{ "{:,}".format(result.value) }}</span>
+            </div>
+            {% endif %}
+        </section>
+
+        {% if metrics and metrics.metrics %}
+        <section class="card info-card">
+            <h2 class="card-title">Model</h2>
+            <ul class="model-stats">
+                <li><span>Algorithm</span><strong>{{ metrics.selected_model }}</strong></li>
+                <li><span>R&sup2; (CV)</span><strong>{{ "%.3f"|format(metrics.metrics.r2_mean) }}</strong></li>
+                <li><span>RMSE</span><strong>{{ "{:,.0f}".format(metrics.metrics.rmse_mean) }}</strong></li>
+                <li><span>MAE</span><strong>{{ "{:,.0f}".format(metrics.metrics.mae_mean) }}</strong></li>
+                <li><span>Training rows</span><strong>{{ metrics.n_samples }}</strong></li>
+            </ul>
+            <p class="api-hint">
+                Programmatic access: <code>POST /api/predict</code> with a JSON body.
+            </p>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer class="footer">
+        <p class="footer-description">
+            Uber Ride Prediction &middot; scikit-learn + Flask &middot; v{{ metrics.model_version if metrics else "1.0.0" }}
+        </p>
+    </footer>
 </body>
 </html>

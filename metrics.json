@@ -1,0 +1,49 @@
+{
+  "model_version": "1.0.0",
+  "selected_model": "GradientBoosting",
+  "n_samples": 27,
+  "features": [
+    "Priceperweek",
+    "Population",
+    "Monthlyincome",
+    "Averageparkingpermonth"
+  ],
+  "target": "Numberofweeklyriders",
+  "cv": {
+    "strategy": "RepeatedKFold",
+    "n_splits": 5,
+    "n_repeats": 10
+  },
+  "metrics": {
+    "r2_mean": 0.8817,
+    "r2_std": 0.129,
+    "rmse_mean": 5167.44,
+    "mae_mean": 3568.37
+  },
+  "leaderboard": [
+    {
+      "model": "GradientBoosting",
+      "r2_mean": 0.8817,
+      "rmse_mean": 5167.44,
+      "mae_mean": 3568.37
+    },
+    {
+      "model": "RandomForest",
+      "r2_mean": 0.8478,
+      "rmse_mean": 5961.51,
+      "mae_mean": 4521.6
+    },
+    {
+      "model": "Ridge",
+      "r2_mean": 0.8247,
+      "rmse_mean": 6295.15,
+      "mae_mean": 5151.4
+    },
+    {
+      "model": "LinearRegression",
+      "r2_mean": 0.8194,
+      "rmse_mean": 6114.5,
+      "mae_mean": 5108.99
+    }
+  ]
+}
